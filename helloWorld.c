@@ -10,34 +10,20 @@
 #include <linux/init.h>
 #include <linux/sched/signal.h>
 #include <linux/sched.h>
+#include <linux/string.h>
+#include <linux/slab.h>
 
 int helloWorld_major;
 static dev_t helloWorld_dev = 0;
 static struct cdev *helloWorld_cdev; 
 static struct class *helloWorld_class;
 
-static int helloWorld_open(struct inode *inode, struct file *filp) {
-	printk(KERN_INFO "open success");
-	return 0;
-}
-
-static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t count,  loff_t *f_pos)  {
-	printk(KERN_INFO, "What are you looking for?");
-	return 0;
-}
-
-static ssize_t  helloWorld_write(struct file *filp, const char __user *buffer, size_t count,  loff_t *f_pos) {
-	printk(KERN_INFO, "No write service");
-	return 0;
-}
-
-static int helloWorld_release(struct inode *inode, struct file *filp) {
-	return 0;
-}
-
-struct helloWorld_object {
-	struct cdev cdev;
-};
+static char s[][10] = {"Good", "soso", "bad"};
+static int counter = 0;
+static int helloWorld_open(struct inode *inode, struct file *filp) ;
+static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t count,  loff_t *f_pos)  ;
+static ssize_t  helloWorld_write(struct file *filp, const char __user *buffer, size_t count,  loff_t *f_pos) ;
+static int helloWorld_release(struct inode *inode, struct file *filp) ;
 
 struct file_operations helloWorld_fops = {
 	.owner = THIS_MODULE,
@@ -45,6 +31,49 @@ struct file_operations helloWorld_fops = {
 	.read = helloWorld_read,
 	.write = helloWorld_write,
 	.release = helloWorld_release,
+};
+
+static int helloWorld_open(struct inode *inode, struct file *filp) 
+{
+	printk(KERN_INFO "open success");
+	return 0;
+}
+
+static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t count,  loff_t *f_pos) 
+{
+    counter = (counter + 1) % 3;
+
+    ssize_t len = 0;
+    char *ptr = s[counter];
+    while(ptr) {
+        len++;
+        ptr++;
+    }
+
+    if (count < len + 1) {
+        printk("buffer length to short\n");
+        return -EFAULT;
+    }
+    if (copy_to_user(buffer, s[counter],len+1)) {
+        return -EFAULT;
+    }
+	printk(KERN_INFO, "What are you looking for?");
+	return len;
+}
+
+static ssize_t  helloWorld_write(struct file *filp, const char __user *buffer, size_t count,  loff_t *f_pos) 
+{
+	printk(KERN_INFO, "No write service");
+	return 0;
+}
+
+static int helloWorld_release(struct inode *inode, struct file *filp) 
+{
+	return 0;
+}
+
+struct helloWorld_object {
+	struct cdev cdev;
 };
 
 static int __init  init_function(void)
@@ -57,7 +86,7 @@ static int __init  init_function(void)
 		printk(KERN_WARNING "helloWorld: can't not alloc get major %d", helloWorld_major);
 		return result;
 	}
-	/* apply cdev structure yo store method of file operations */
+	/* apply cdev structure to store method of file operations */
 	helloWorld_cdev = cdev_alloc();
 	if (!helloWorld_cdev) {
 		printk(KERN_WARNING "alloc_cdev() fail\n");
@@ -89,7 +118,7 @@ static int __init  init_function(void)
 	}
 
 	printk(KERN_INFO "Hello World\n");
-	return result;
+    return result;
 	
 
 failed_device_create:
@@ -104,6 +133,10 @@ failed_cdev:
 
 static void __exit exit_function(void)
 {
+    int i;
+    for (i = 0;i < 3;++i)
+        kfree(s[i]);
+    kfree(s);
 	device_destroy(helloWorld_class, helloWorld_dev);
 	class_destroy(helloWorld_class);
 	cdev_del(helloWorld_cdev);
