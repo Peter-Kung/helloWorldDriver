@@ -133,10 +133,6 @@ failed_cdev:
 
 static void __exit exit_function(void)
 {
-    int i;
-    for (i = 0;i < 3;++i)
-        kfree(s[i]);
-    kfree(s);
 	device_destroy(helloWorld_class, helloWorld_dev);
 	class_destroy(helloWorld_class);
 	cdev_del(helloWorld_cdev);
