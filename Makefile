@@ -22,7 +22,9 @@ ifeq ($(CPPCHECK), 1)
 endif
 
 install: 
+ifeq ($(shell lsmod | grep hello), )
 	sudo insmod $(TARGET).ko
+endif
 
 uninstall:
 ifneq ($(shell lsmod | grep hello), )
