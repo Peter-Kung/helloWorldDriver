@@ -18,7 +18,7 @@ static dev_t helloWorld_dev = 0;
 static struct cdev *helloWorld_cdev; 
 static struct class *helloWorld_class;
 
-static char s[][10] = {"Good", "soso", "bad"};
+static char s[][10] = {"Good\n", "soso\n", "bad\n"};
 static int counter = 0;
 static int helloWorld_open(struct inode *inode, struct file *filp) ;
 static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t count,  loff_t *f_pos)  ;
@@ -43,22 +43,19 @@ static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t co
 {
     counter = (counter + 1) % 3;
 
-    ssize_t len = 0;
-    char *ptr = s[counter];
-    while(ptr) {
-        len++;
-        ptr++;
-    }
-
+    ssize_t len = strlen(s[counter]);
+    
     if (count < len + 1) {
         printk("buffer length to short\n");
         return -EFAULT;
     }
-    if (copy_to_user(buffer, s[counter],len+1)) {
+
+    count = len;
+    if (copy_to_user(buffer, s[counter],count)) {
         return -EFAULT;
     }
-	printk(KERN_INFO, "What are you looking for?");
-	return len;
+    printk(KERN_INFO "count: %d\n", count);
+    return count;
 }
 
 static ssize_t  helloWorld_write(struct file *filp, const char __user *buffer, size_t count,  loff_t *f_pos) 
