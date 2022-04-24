@@ -13,12 +13,15 @@
 #include <linux/string.h>
 #include <linux/slab.h>
 
+#define LENGTH 10
+
 int helloWorld_major;
 static dev_t helloWorld_dev = 0;
 static struct cdev *helloWorld_cdev; 
 static struct class *helloWorld_class;
 
-static char s[][10] = {"Good\n", "soso\n", "bad\n"};
+static char recvi[LENGTH] = {0};
+static char s[][10] = {"Good", "soso", "bad"};
 static int counter = 0;
 static int helloWorld_open(struct inode *inode, struct file *filp) ;
 static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t count,  loff_t *f_pos)  ;
@@ -60,8 +63,17 @@ static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t co
 
 static ssize_t  helloWorld_write(struct file *filp, const char __user *buffer, size_t count,  loff_t *f_pos) 
 {
-	printk(KERN_INFO, "No write service");
-	return 0;
+	int result = 0;
+	if (LENGTH < count) {
+		printk(KERN_WARNING "buffer length can't contain %d (maximun: 10)", count);
+		return -EFAULT;
+	}
+	if (result = copy_from_user(recvi, buffer, count)) {
+		printk(KERN_WARNING "copy_from_user error %d", result);
+		return result;
+	}
+	printk(KERN_INFO "Result: %s", recvi);
+	return result;
 }
 
 static int helloWorld_release(struct inode *inode, struct file *filp) 

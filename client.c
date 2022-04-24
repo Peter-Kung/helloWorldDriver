@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
 #define DUT "/dev/helloWorld"
+
+int countLen(char *);
 
 int main()
 {
@@ -15,7 +18,11 @@ int main()
     
     char buf[100] = {0};
     read(fd, buf, 100);
-    printf("%s", buf);
+    printf("%s\n", buf);
+    char *s = strdup("Write test");
+    write(fd, s, strlen(s));
+    puts("Done\n");
 
+    close(fd);
     return 0;
 }   
