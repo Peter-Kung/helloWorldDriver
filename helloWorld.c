@@ -13,6 +13,9 @@
 #include <linux/string.h>
 #include <linux/slab.h>
 
+#include "./helloWorld.h"	
+
+
 #define LENGTH 10
 
 int helloWorld_major;
@@ -27,14 +30,9 @@ static int helloWorld_open(struct inode *inode, struct file *filp) ;
 static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t count,  loff_t *f_pos)  ;
 static ssize_t  helloWorld_write(struct file *filp, const char __user *buffer, size_t count,  loff_t *f_pos) ;
 static int helloWorld_release(struct inode *inode, struct file *filp) ;
+long helloWorld_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
 
-struct file_operations helloWorld_fops = {
-	.owner = THIS_MODULE,
-	.open = helloWorld_open,
-	.read = helloWorld_read,
-	.write = helloWorld_write,
-	.release = helloWorld_release,
-};
+
 
 static int helloWorld_open(struct inode *inode, struct file *filp) 
 {
@@ -76,10 +74,65 @@ static ssize_t  helloWorld_write(struct file *filp, const char __user *buffer, s
 	return result;
 }
 
+
+/*
+ * @inode, @filp: for FILE structure use
+ * @cmd: choose cmd th io command
+ * @args: optional, decided by cmd spec
+ */
+long helloWorld_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+	int breakfast = 0, err = 0, ret = 0;
+	int dinner = 0;
+	/* cmd bits represents significant meaning:
+	 * bits 31 ~ 24: driver major number
+	 * bits 23 ~ 17: cmd number
+	 * bits 16 ~ 1 : datatype size
+	 */
+
+	/* Check cmd is belong to this module: _IOC_TYPE(nr) :=  (((nr) >> _IOC_TYPESHIFT) & _IOC_TYPEMASK) */
+	if (_IOC_TYPE(cmd) != IOC_MAGIC){
+		printk(KERN_WARNING "This ioctl rule is not this module\n");
+		return -ENOTTY;
+	}
+ 
+	/* Check cmd is exist: IOC_NR := (((nr) >> _IOC_NRSHIFT) & _IOC_NRMASK) */
+	if (_IOC_NR(cmd) > IOC_MAXNR) {
+		printk(KERN_WARNING, "This ioctl rule is not exist\n");
+		return -ENOTTY;
+	}
+
+    switch (cmd) {
+
+		case SETBREAKFIRST:
+			ret = __get_user(breakfast, (int __user*)arg);
+			break;
+		case SETDINNER:
+			ret = __get_user(dinner , (int __user*)arg);
+			break;
+		default:
+			return -ENOTTY;
+
+	}
+
+	printk(KERN_INFO "breakfase: %d\ndinner: %d\n", breakfast, dinner);
+
+	return ret;
+}
+
 static int helloWorld_release(struct inode *inode, struct file *filp) 
 {
 	return 0;
 }
+
+struct file_operations helloWorld_fops = {
+	.owner = THIS_MODULE,
+	.open = helloWorld_open,
+	.read = helloWorld_read,
+	.write = helloWorld_write,
+	.release = helloWorld_release,
+	 .unlocked_ioctl = helloWorld_ioctl,
+};
 
 struct helloWorld_object {
 	struct cdev cdev;

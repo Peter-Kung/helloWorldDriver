@@ -3,6 +3,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "./helloWorld.h"
 #define DUT "/dev/helloWorld"
 
 int countLen(char *);
@@ -21,6 +22,11 @@ int main()
     printf("%s\n", buf);
     char *s = strdup("Write test");
     write(fd, s, strlen(s));
+
+    int val1 = 1, val2 = 2; 
+    ioctl(fd, SETBREAKFIRST, &val1);
+    ioctl(fd, SETDINNER, &val2);
+
     puts("Done\n");
 
     close(fd);
