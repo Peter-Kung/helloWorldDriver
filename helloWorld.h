@@ -5,3 +5,4 @@
 #define IOC_MAXNR 3
 #define SETBREAKFIRST _IOW(IOC_MAGIC, 1, int *)
 #define SETDINNER     _IOW(IOC_MAGIC, 2, int *)
+#define SETARRAYTOKERNEL _IOW(IOC_MAGIC, 0, int *)

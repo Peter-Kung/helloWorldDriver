@@ -22,11 +22,12 @@ int main()
     printf("%s\n", buf);
     char *s = strdup("Write test");
     write(fd, s, strlen(s));
-
+	
+    int arr[3] = {3, 4, 5};
     int val1 = 1, val2 = 2; 
     ioctl(fd, SETBREAKFIRST, &val1);
     ioctl(fd, SETDINNER, &val2);
-
+    ioctl(fd, SETARRAYTOKERNEL,arr); 
     puts("Done\n");
 
     close(fd);

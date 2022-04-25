@@ -82,6 +82,7 @@ static ssize_t  helloWorld_write(struct file *filp, const char __user *buffer, s
  */
 long helloWorld_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
+	int arr[3] = {0};
 	int breakfast = 0, err = 0, ret = 0;
 	int dinner = 0;
 	/* cmd bits represents significant meaning:
@@ -103,7 +104,11 @@ long helloWorld_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	}
 
     switch (cmd) {
-
+		
+	    	case SETARRAYTOKERNEL:
+			if (copy_from_user(arr, (int __user*)arg, 12))
+				return -EFAULT;
+			break;
 		case SETBREAKFIRST:
 			ret = __get_user(breakfast, (int __user*)arg);
 			break;
@@ -114,7 +119,7 @@ long helloWorld_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			return -ENOTTY;
 
 	}
-
+	printk(KERN_INFO "num[0]: %d\nnum[1]: %d\n, num[2]: %d\n", arr[0], arr[1], arr[2]);
 	printk(KERN_INFO "breakfase: %d\ndinner: %d\n", breakfast, dinner);
 
 	return ret;
@@ -131,7 +136,7 @@ struct file_operations helloWorld_fops = {
 	.read = helloWorld_read,
 	.write = helloWorld_write,
 	.release = helloWorld_release,
-	 .unlocked_ioctl = helloWorld_ioctl,
+	.unlocked_ioctl = helloWorld_ioctl,
 };
 
 struct helloWorld_object {
