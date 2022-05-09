@@ -44,6 +44,7 @@ static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t co
 {
     counter = (counter + 1) % 3;
 
+	int arr[] = {10, 20, 30};
     ssize_t len = strlen(s[counter]);
     
     if (count < len + 1) {
@@ -52,7 +53,7 @@ static ssize_t helloWorld_read(struct file *filp, char __user *buffer, size_t co
     }
 
     count = len;
-    if (copy_to_user(buffer, s[counter],count)) {
+    if (copy_to_user((int __user*)buffer, arr, 12)) {
         return -EFAULT;
     }
     printk(KERN_INFO "count: %d\n", count);
@@ -104,8 +105,7 @@ long helloWorld_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	}
 
     switch (cmd) {
-		
-	    	case SETARRAYTOKERNEL:
+	    case SETARRAYTOKERNEL:
 			if (copy_from_user(arr, (int __user*)arg, 12))
 				return -EFAULT;
 			break;

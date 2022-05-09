@@ -17,9 +17,13 @@ int main()
         exit(1);
     }
     
-    char buf[100] = {0};
-    read(fd, buf, 100);
-    printf("%s\n", buf);
+    //char buf[100] = {0};
+    int i, buf[3];
+    read(fd, &buf, 100);
+    for (i = 0;i < 3;++i) {
+        printf("%d ", buf[i]);
+    }
+    //printf("%s\n", buf);
     char *s = strdup("Write test");
     write(fd, s, strlen(s));
 	

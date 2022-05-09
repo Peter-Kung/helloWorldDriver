@@ -1,0 +1,1 @@
+cmd_/home/wmlab/Peter-Kung/helloWorldDriver/helloWorld/helloWorld.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/wmlab/Peter-Kung/helloWorldDriver/helloWorld/helloWorld.ko /home/wmlab/Peter-Kung/helloWorldDriver/helloWorld/helloWorld.o /home/wmlab/Peter-Kung/helloWorldDriver/helloWorld/helloWorld.mod.o;  true
