@@ -1,1 +1,0 @@
-cmd_/home/wmlab/Peter-Kung/helloWorldDriver/helloWorld/helloWorld.mod := { echo  /home/wmlab/Peter-Kung/helloWorldDriver/helloWorld/helloWorld.o;  echo; } > /home/wmlab/Peter-Kung/helloWorldDriver/helloWorld/helloWorld.mod
