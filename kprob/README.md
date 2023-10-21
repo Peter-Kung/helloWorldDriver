@@ -6,12 +6,12 @@ $ uname -r
 ```
 if the version < 5.4, please update  linux kernel.
 
-- Install linux-headers package
+## Install linux-headers package
 ```
 $ sudo apt install linux-headers-`uname -r`
 ```
 
-- Confirm linux-headers package installed correctly
+## Confirm linux-headers package installed correctly
 ```
 $ dpkg -L linux-headers-`uname -r` | grep "/lib/modules/.*/build"
 ```
