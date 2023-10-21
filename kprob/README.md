@@ -20,3 +20,7 @@ The output of perspective:
 ```
 /lib/modules/<your version>/build
 ```
+
+
+## Reference
+[Linux 核心模組運作原理](https://hackmd.io/@sysprog/linux-kernel-module)
